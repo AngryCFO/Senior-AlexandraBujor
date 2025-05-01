@@ -224,7 +224,9 @@ python auto_test_script.py
    - `simulator_py.py` — имитация устройства.
    - `complete-web-interface.html` — GUI для управления.
    - `integration-test-script.py` — основной скрипт интеграции.
-   
+   - `client_script.py` — клиент для ручного тестирования API симулятора.
+   - `integration_module.py` — модуль интеграции между GUI и симулятором.
+   - `auto_test_script.py` — автоматизированные тесты взаимодействия GUI и симулятора.
 
 ---
 

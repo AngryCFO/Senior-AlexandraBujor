@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>УФ пеленгатор - Панель управления</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            border-bottom: 5px solid #3498db;
+        }
+        h1, h2 {
+            margin: 0;
+        }
+        .subheading {
+            font-size: 1.2rem;
+            color: #bdc3c7;
+            margin-top: 5px;
+        }
+        .main-content {
+            display: flex;
+            margin-top: 20px;
+        }
+        .video-container {
+            flex: 2;
+            background-color: #000;
+            position: relative;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .video-feed {
+            width: 100%;
+            height: 480px;
+            background-color: #333;
+            position: relative;
+        }
+        .video-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 10px;
+        }
+        .status-idle {
+            background-color: #7f8c8d;
+            color: white;
+        }
+        .status-show {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .status-record {
+            background-color: #e74c3c;
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        .no-signal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #aaa;
+            font-size: 24px;
+            text-align: center;
+        }
+        .controls {
+            flex: 1;
+            padding: 0 0 0 20px;
+        }
+        .control-panel {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .start-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .record-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .stop-btn {
+            background-color: #7f8c8d;
+            color: white;
+        }
+        .device-info {
+            margin-top: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .logs {
+            margin-top: 20px;
+        }
+        .log-container {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            height: 150px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+        .log-time {
+            color: #3498db;
+            margin-right: 10px;
+        }
+        .log-info {
+            color: #2ecc71;
+        }
+        .log-warn {
+            color: #f39c12;
+        }
+        .log-error {
+            color: #e74c3c;
+        }
+        
+        /* Имитация точек УФ-излучения */
+        .uv-point {
+            position: absolute;
+            border-radius: 50%;
+            background-color: radial-gradient(circle, rgba(0,0,255,0.8) 0%, rgba(0,0,255,0) 70%);
+            filter: blur(2px);
+            box-shadow: 0 0 5px 2px rgba(0,0,255,0.7);
+            animation: flicker 2s infinite;
+        }
+        @keyframes flicker {
+            0% { opacity: 0.7; }
+            25% { opacity: 0.9; }
+            50% { opacity: 0.5; }
+            75% { opacity: 0.8; }
+            100% { opacity: 0.7; }
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px 0;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>УФ пеленгатор</h1>
+            <div class="subheading">Система обнаружения коронных разрядов на ЛЭП</div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="main-content">
+            <div class="video-container">
+                <div class="video-feed" id="video-feed">
+                    <div class="no-signal" id="no-signal">
+                        <div>НЕТ СИГНАЛА</div>
+                        <div style="font-size: 16px; margin-top: 10px;">Нажмите "Запустить трансляцию" для начала работы</div>
+                    </div>
+                    <!-- Здесь будут динамически добавляться точки UV-излучения -->
+                </div>
+                <div class="video-overlay">
+                    <span id="timestamp">2025-05-01 00:00:00</span>
+                    <span class="status-badge status-idle" id="device-status">idle</span>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <div class="control-panel">
+                    <h2>Управление устройством</h2>
+                    <div class="button-group">
+                        <button id="start-stream-btn" class="start-btn">Запустить трансляцию</button>
+                    </div>
+                    <div class="button-group">
+                        <button id="record-btn" class="record-btn">Запустить запись</button>
+                        <button id="stop-btn" class="stop-btn">Остановить</button>
+                    </div>
+                </div>
+                
+                <div class="device-info">
+                    <h2>Информация об устройстве</h2>
+                    <div class="info-item">
+                        <span class="info-label">Статус:</span>
+                        <span id="status-display">Ожидание</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Время работы:</span>
+                        <span id="uptime">00:00:00</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">IP-адрес:</span>
+                        <span>127.0.0.1:8080</span>
+                    </div>
+                </div>
+                
+                <div class="logs">
+                    <h2>Журнал событий</h2>
+                    <div class="log-container" id="log-container">
+                        <!-- Журнал событий будет заполняться динамически -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            &copy; 2025 УФ пеленгатор - Система обнаружения коронных разрядов
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Константы и переменные
+            const API_URL = 'http://localhost:8080/jsonrpc';
+            let deviceStatus = 'idle';
+            let startTime = null;
+            let uvPoints = [];
+            let frameCounter = 0;
+            
+            // Элементы интерфейса
+            const videoFeed = document.getElementById('video-feed');
+            const noSignalElement = document.getElementById('no-signal');
+            const statusBadge = document.getElementById('device-status');
+            const statusDisplay = document.getElementById('status-display');
+            const timestampElement = document.getElementById('timestamp');
+            const uptimeElement = document.getElementById('uptime');
+            const logContainer = document.getElementById('log-container');
+            
+            // Кнопки
+            const startStreamBtn = document.getElementById('start-stream-btn');
+            const recordBtn = document.getElementById('record-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            
+            // Функции для работы с API устройства
+            async function sendJsonRpcRequest(method, params = null) {
+                const requestId = Date.now();
+                const payload = {
+                    jsonrpc: '2.0',
+                    method: method,
+                    id: requestId
+                };
+                
+                if (params) {
+                    payload.params = params;
+                }
+                
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    return await response.json();
+                } catch (error) {
+                    logMessage(`Ошибка запроса к API: ${error.message}`, 'error');
+                    return { error: { message: error.message } };
+                }
+            }
+            
+            // Обновление статуса устройства
+            async function updateDeviceStatus() {
+                try {
+                    const response = await sendJsonRpcRequest('VideoRpc.Status');
+                    if (response.result && response.result.res) {
+                        setDeviceStatus(response.result.res);
+                    }
+                } catch (error) {
+                    logMessage(`Ошибка получения статуса: ${error.message}`, 'error');
+                }
+            }
+            
+            // Установка статуса устройства в интерфейсе
+            function setDeviceStatus(status) {
+                const oldStatus = deviceStatus;
+                deviceStatus = status;
+                
+                // Обновляем бейдж статуса
+                statusBadge.className = `status-badge status-${status}`;
+                statusBadge.textContent = status;
+                
+                // Обновляем текстовое отображение статуса
+                let statusText;
+                switch (status) {
+                    case 'idle':
+                        statusText = 'Ожидание';
+                        noSignalElement.style.display = 'block';
+                        clearUVPoints();
+                        break;
+                    case 'show':
+                        statusText = 'Трансляция';
+                        noSignalElement.style.display = 'none';
+                        if (!startTime) startTime = new Date();
+                        break;
+                    case 'record':
+                        statusText = 'Запись';
+                        noSignalElement.style.display = 'none';
+                        if (!startTime) startTime = new Date();
+                        break;
+                    default:
+                        statusText = 'Неизвестно';
+                }
+                statusDisplay.textContent = statusText;
+                
+                // Логируем изменение статуса
+                if (oldStatus !== status) {
+                    logMessage(`Устройство перешло в режим: ${statusText}`, 'info');
+                }
+                
+                // Если в режиме трансляции или записи, начинаем обновлять UV точки
+                if (status === 'show' || status === 'record') {
+                    if (!window.uvInterval) {
+                        window.uvInterval = setInterval(updateUVPoints, 100);
+                        window.uptimeInterval = setInterval(updateUptime, 1000);
+                    }
+                } else {
+                    if (window.uvInterval) {
+                        clearInterval(window.uvInterval);
+                        window.uvInterval = null;
+                    }
+                    if (window.uptimeInterval && status === 'idle') {
+                        clearInterval(window.uptimeInterval);
+                        window.uptimeInterval = null;
+                        startTime = null;
+                    }
+                }
+            }
+            
+            // Обновление времени работы
+            function updateUptime() {
+                if (!startTime) return;
+                
+                const now = new Date();
+                const diff = now - startTime;
+                
+                const hours = Math.floor(diff / 3600000).toString().padStart(2, '0');
+                const minutes = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                const seconds = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                
+                uptimeElement.textContent = `${hours}:${minutes}:${seconds}`;
+                
+                // Обновляем текущую временную метку
+                const timestamp = now.toISOString().replace('T', ' ').substring(0, 19);
+                timestampElement.textContent = timestamp;
+            }
+            
+            // Генерация и обновление точек УФ излучения
+            function updateUVPoints() {
+                frameCounter++;
+                
+                // Каждые 10 кадров полностью обновляем точки
+                if (frameCounter % 10 === 0) {
+                    clearUVPoints();
+                    
+                    const numPoints = Math.floor(Math.random() * 10) + 5;
+                    for (let i = 0; i < numPoints; i++) {
+                        createUVPoint();
+                    }
+                } else {
+                    // В остальных кадрах случайно смещаем существующие точки
+                    uvPoints.forEach(point => {
+                        const x = parseInt(point.style.left) + (Math.random() * 6 - 3);
+                        const y = parseInt(point.style.top) + (Math.random() * 6 - 3);
+                        
+                        // Ограничиваем координаты внутри контейнера
+                        point.style.left = `${Math.max(0, Math.min(videoFeed.clientWidth - parseInt(point.style.width), x))}px`;
+                        point.style.top = `${Math.max(0, Math.min(videoFeed.clientHeight - parseInt(point.style.height), y))}px`;
+                    });
+                }
+            }
+            
+            // Создание новой точки УФ излучения
+            function createUVPoint() {
+                const point = document.createElement('div');
+                point.className = 'uv-point';
+                
+                const size = Math.floor(Math.random() * 8) + 4;
+                const x = Math.floor(Math.random() * (videoFeed.clientWidth - size));
+                const y = Math.floor(Math.random() * (videoFeed.clientHeight - size));
+                
+                point.style.width = `${size}px`;
+                point.style.height = `${size}px`;
+                point.style.left = `${x}px`;
+                point.style.top = `${y}px`;
+                point.style.backgroundColor = 'blue';
+                
+                videoFeed.appendChild(point);
+                uvPoints.push(point);
+                
+                return point;
+            }
+            
+            // Очистка всех точек УФ излучения
+            function clearUVPoints() {
+                uvPoints.forEach(point => {
+                    if (point.parentNode === videoFeed) {
+                        videoFeed.removeChild(point);
+                    }
+                });
+                uvPoints = [];
+            }
+            
+            // Логирование событий
+            function logMessage(message, type = 'info') {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString();
+                
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                
+                const timeSpan = document.createElement('span');
+                timeSpan.className = 'log-time';
+                timeSpan.textContent = timeStr;
+                
+                const messageSpan = document.createElement('span');
+                messageSpan.className = `log-${type}`;
+                messageSpan.textContent = message;
+                
+                logEntry.appendChild(timeSpan);
+                logEntry.appendChild(messageSpan);
+                
+                logContainer.appendChild(logEntry);
+                logContainer.scrollTop = logContainer.scrollHeight;
+                
+                // Ограничиваем количество записей в журнале
+                while (logContainer.children.length > 100) {
+                    logContainer.removeChild(logContainer.firstChild);
+                }
+            }
+            
+            // Обработчики событий для кнопок
+            startStreamBtn.addEventListener('click', async function() {
+                logMessage('Запуск трансляции...', 'info');
+                const response = await sendJsonRpcRequest('VideoRpc.Show');
+                if (response.result && response.result.res === 'show') {
+                    setDeviceStatus('show');
+                } else if (response.error) {
+                    logMessage(`Ошибка запуска трансляции: ${response.error.message}`, 'error');
+                }
+            });
+            
+            recordBtn.addEventListener('click', async function() {
+                logMessage('Запуск записи...', 'info');
+                const response = await sendJsonRpcRequest('VideoRpc.Record');
+                if (response.result && response.result.res === 'record') {
+                    setDeviceStatus('record');
+                } else if (response.error) {
+                    logMessage(`Ошибка запуска записи: ${response.error.message}`, 'error');
+                }
+            });
+            
+            stopBtn.addEventListener('click', async function() {
+                logMessage('Остановка устройства...', 'info');
+                const response = await sendJsonRpcRequest('VideoRpc.Stop');
+                if (response.result && response.result.res === 'idle') {
+                    setDeviceStatus('idle');
+                } else if (response.error) {
+                    logMessage(`Ошибка остановки: ${response.error.message}`, 'error');
+                }
+            });
+            
+            // Периодический запрос статуса устройства для синхронизации с другими клиентами
+            function startStatusPolling() {
+                logMessage('Подключение к устройству...', 'info');
+                
+                // Первичное получение статуса
+                updateDeviceStatus().then(() => {
+                    logMessage('Подключение успешно установлено', 'info');
+                }).catch(error => {
+                    logMessage(`Не удалось установить соединение: ${error.message}`, 'error');
+                });
+                
+                // Периодический опрос статуса каждые 3 секунды
+                window.statusInterval = setInterval(updateDeviceStatus, 3000);
+            }
+            
+            // Обработка закрытия страницы - очистка интервалов
+            window.addEventListener('beforeunload', function() {
+                if (window.uvInterval) clearInterval(window.uvInterval);
+                if (window.uptimeInterval) clearInterval(window.uptimeInterval);
+                if (window.statusInterval) clearInterval(window.statusInterval);
+            });
+            
+            // Запускаем приложение
+            logMessage('Инициализация панели управления...', 'info');
+            startStatusPolling();
+        });
+    </script>
+</body>
+</html>

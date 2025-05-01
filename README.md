@@ -192,9 +192,9 @@ python auto_test_script.py
 
 2. **Инструкция в README.md:**
    
-   # Тестирование ПО УФ пеленгатора
+   #### Тестирование ПО УФ пеленгатора
 
-   ## Запуск системы
+   ##### Запуск системы
    1. Установите зависимости:
       ```bash
       pip install requests selenium opencv-python
@@ -220,11 +220,11 @@ python auto_test_script.py
       python auto_test_script.py
       ```
 
-   ## Описание компонентов
+   ##### Описание компонентов
    - `simulator_py.py` — имитация устройства.
    - `complete-web-interface.html` — GUI для управления.
    - `integration-test-script.py` — основной скрипт интеграции.
-   ```
+   
 
 ---
 

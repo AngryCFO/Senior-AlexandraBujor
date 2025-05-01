@@ -179,7 +179,7 @@ python auto_test_script.py
 
 ## **4. Как запустить процесс тестиованиея**
 1. **Архив проекта:**  
-   - Распакуйте все файлы из ZIP:  
+   - Распакуйте все файлы из [ZIP](https://github.com/AngryCFO/Senior-AlexandraBujor/blob/a9abc2e59ba493baf88bf4f510d96b1709cba88b/MyTestProject_by_AlexandraBujor.zip):  
      ```
      simulator_py.py
      client_script.py
